@@ -43,8 +43,17 @@ function update() {
     box.body.angularVelocity = 200;
     box.body.velocity.y = -100;
   }
+
+  game.physics.arcade.overlap(box, children, givenGift, null);
 }
 
 function changeText() {
+  filedText.text = 'Gifts: ' + score;
+}
+
+function givenGift() {
+  children.kill();
+  box.kill();
+  score++;
   filedText.text = 'Gifts: ' + score;
 }
