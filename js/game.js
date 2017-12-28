@@ -2,13 +2,11 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 var player;
 var cursors;
-var box;
-var children;
 var score = 0;
 
 function preload() {
   game.load.image('santa', 'assets/santa.png');
-  game.load.image('children', 'assets/children.png');
+  game.load.image('child', 'assets/children.png');
   game.load.image('box', 'assets/box.png');
   cursors = game.input.keyboard.createCursorKeys();
 }
@@ -18,14 +16,26 @@ function create() {
   game.physics.startSystem(Phaser.Physics.ARCADE);
   player = game.add.sprite(game.world.width/2, game.world.height, 'santa');
   player.anchor.setTo(0.5, 1);
-  children = game.add.sprite(Math.floor(Math.random()*600), 80, 'children');
-  children.anchor.setTo(0.5, 0.5);
-  box = game.add.sprite(400, 300, 'box');
-  box.anchor.setTo(0.5, 0.5);
+  //child = game.add.sprite(Math.floor(Math.random()*600), 80, 'child');
+  //child.anchor.setTo(0.5, 0.5);
+  //box = game.add.sprite(400, 300, 'box');
+  //box.anchor.setTo(0.5, 0.5);
   game.physics.arcade.enable(player);
-  game.physics.arcade.enable(children);
-  game.physics.arcade.enable(box);
+  //game.physics.arcade.enable(child);
+  //game.physics.arcade.enable(box);
   game.time.events.add(Phaser.Timer.SECOND * 4, changeText);
+
+  gifts = game.add.group(game.world, 'Gifts', false);
+  var box = gifts.create(player.x, player.y - 124, 'box');
+  game.physics.arcade.enable(box);
+
+  children = game.add.group(game.world, 'Children', false);
+
+  for (var i = 1; i < 3; i++) {
+    var child = children.create(Math.floor(Math.random()*600), 80, 'child');
+    game.physics.arcade.enable(child);
+    //child.anchor.setTo(0.5, 0.5);
+  }
 }
 
 function update() {
@@ -38,9 +48,12 @@ function update() {
     player.body.velocity.x = 0;
   }
 
-  if (cursors.up.isDown) {
-    box.reset(player.x, player.y - 124);
+  if ((cursors.up.isDown && (box.body.y < 80))) {
+    var box = gifts.create(player.x, player.y - 124, 'box');
+    //box.reset(player.x, player.y - 124);
     box.body.angularVelocity = 200;
+    //box.body.velocity.y = -100;
+  } else {
     box.body.velocity.y = -100;
   }
 
@@ -51,8 +64,8 @@ function changeText() {
   filedText.text = 'Gifts: ' + score;
 }
 
-function givenGift() {
-  children.kill();
+function givenGift(box, child) {
+  child.kill();
   box.kill();
   score++;
   filedText.text = 'Gifts: ' + score;
